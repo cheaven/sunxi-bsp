@@ -75,7 +75,7 @@ rootfs-parts: $(ROOTFS_BASENAME).ext4 hwpack
 	$(Q)scripts/mk_ext4_rootfs_p.sh $(ROOTFS) $(HWPACK) $(OUTPUT_DIR)
 
 
-livesuit: allwinner-tools/.git rootfs-parts tools linux
+livesuit: allwinner-tools/.git rootfs-parts tools
 	$(Q)scripts/mk_livesuit_img_p.sh -R $(OUTPUT_DIR)/rootfs.ext4
 
 ## android
