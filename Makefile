@@ -1,6 +1,6 @@
 .PHONY: all clean help
-.PHONY: tools u-boot linux libs hwpack hwpack-install
-.PHONY: linux-config livesuit android
+.PHONY: tools u-boot linux libs hwpack hwpack-install usbdisp
+.PHONY: linux-config livesuit android rootfs-parts
 
 SUDO=sudo
 CROSS_COMPILE=arm-linux-gnueabihf-
@@ -71,8 +71,12 @@ hwpack: $(HWPACK)
 %.ext4: %.tar.gz
 	$(Q)scripts/mk_ext4_rootfs.sh $< $@
 
-livesuit: allwinner-tools/.git $(ROOTFS_BASENAME).ext4 tools linux
-	$(Q)scripts/mk_livesuit_img.sh -R $(ROOTFS_BASENAME).ext4
+rootfs-parts: $(ROOTFS_BASENAME).ext4 hwpack
+	$(Q)scripts/mk_ext4_rootfs_p.sh $(ROOTFS) $(HWPACK) $(OUTPUT_DIR)
+
+
+livesuit: allwinner-tools/.git rootfs-parts tools linux
+	$(Q)scripts/mk_livesuit_img_p.sh -R $(OUTPUT_DIR)/rootfs.ext4
 
 ## android
 android-%:
@@ -81,11 +85,15 @@ android-%:
 android: android-build
 
 ## hwpack-install
-hwpack-install: $(HWPACK)
+hwpack-install:
 	$(Q)[ -s $(SD_CARD) ] || echo "Define SD_CARD variable"
 	$(Q)$(SUDO) scripts/sunxi-media-create.sh $(SD_CARD) $(HWPACK) $(ROOTFS)
 
-libs: cedarx-libs/.git
+libs: cedarx-libs/.git usbdisp
+
+usbdisp: rpusbdisp/.git
+	$(Q)(cd rpusbdisp/drivers/linux-driver && $(MAKE)  O=$(K_O_PATH) ARCH=arm CROSS_COMPILE=${CROSS_COMPILE} KERNEL_SOURCE_DIR=$(CURDIR)/linux-sunxi) 
+	$(Q)(cd rpusbdisp/drivers/linux-driver && $(MAKE)  O=$(K_O_PATH) ARCH=arm INSTALL_MOD_PATH=$(K_O_PATH)/output install)
 
 update:
 	$(Q)git stash

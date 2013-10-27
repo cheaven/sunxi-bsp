@@ -6,6 +6,16 @@ if [ ! -d sunxi-boards/sys_config/ ]; then
 	git submodule update sunxi-boards
 fi
 
+
+if [ ! -d rpaddon/rootfs_addon/ ]; then
+        git submodule update rpaddon
+fi
+
+if [ ! -d linux-sunxi/arch/arm/configs/ ]; then
+        git submodule update linux-sunxi
+fi
+
+
 list_boards() {
 	ls -1 sunxi-boards/sys_config/*/*.fex |
 	sed -n -e 's|.*/\([^/]\+\)\.fex$|\1|p' | sort -V |
@@ -29,11 +39,17 @@ generate_board_mk() {
 
 	case "$soc" in
 	a10)
-		cat <<-EOT
+		#cat <<-EOT
+		#MACH=sun4i
+	        #KERNEL_CONFIG=sun4i${android:+_crane}_defconfig
+		#EOT
+                cp -f rpaddon/kernel_configs/sun4i_robopeakspec_defconfig linux-sunxi/arch/arm/configs/
+
+                cat <<-EOT
 		MACH=sun4i
-		KERNEL_CONFIG=sun4i${android:+_crane}_defconfig
+		KERNEL_CONFIG=sun4i_robopeakspec_defconfig
 		EOT
-		;;
+                ;;
 	a13)
 		cat <<-EOT
 		MACH=sun5i

@@ -17,6 +17,22 @@ HWPACK_DIR="build/${BOARD}_hwpack"
 
 ABI=armhf
 
+cp_rpusbdisp_tools() {
+        local rootfs="$1"
+
+        mkdir -p "$rootfs/etc/init"
+        mkdir -p "$rootfs/etc/init.d"
+        mkdir -p "$rootfs/etc/rpusbdisp"
+        cp -f rpusbdisp/tools/arm_suite/scripts/rpusbdispd.sh "$rootfs/etc/rpusbdisp/"
+        chmod +x "$rootfs/etc/rpusbdisp/rpusbdispd.sh"
+        
+        cp -f rpusbdisp/tools/arm_suite/scripts/rpusbdispd "$rootfs/etc/init.d/"
+        chmod +x "$rootfs/etc/init.d/rpusbdispd"
+        
+        cp -f rpusbdisp/tools/arm_suite/conf/rpusbdisp.conf "$rootfs/etc/init/"
+        cp -f rpusbdisp/tools/arm_suite/conf/10-disp.conf "$rootfs/etc/rpusbdisp/"
+}
+
 cp_debian_files() {
 	local rootfs="$1"
 	local cedarxdir="cedarx-libs/libcedarv/linux-$ABI"
@@ -25,7 +41,7 @@ cp_debian_files() {
 
 	echo "Debian/Ubuntu hwpack"
 	cp -r "rootfs/debian-ubuntu"/* "$rootfs/"
-
+        cp_rpusbdisp_tools "$rootfs"
 	## libs
 	install -m 0755 $(find "$cedarxdir" -name '*.so') "$rootfs/lib/"
 
