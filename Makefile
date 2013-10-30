@@ -93,7 +93,7 @@ libs: cedarx-libs/.git usbdisp
 
 usbdisp: rpusbdisp/.git
 	$(Q)(cd rpusbdisp/drivers/linux-driver && $(MAKE)  O=$(K_O_PATH) ARCH=arm CROSS_COMPILE=${CROSS_COMPILE} KERNEL_SOURCE_DIR=$(CURDIR)/linux-sunxi) 
-	$(Q)(cd rpusbdisp/drivers/linux-driver && $(MAKE)  O=$(K_O_PATH) ARCH=arm INSTALL_MOD_PATH=$(K_O_PATH)/output install)
+	$(Q)(cd rpusbdisp/drivers/linux-driver && $(MAKE)  O=$(K_O_PATH) ARCH=arm INSTALL_MOD_PATH=$(K_O_PATH)/output KERNEL_SOURCE_DIR=$(CURDIR)/linux-sunxi install)
 
 update:
 	$(Q)git stash
